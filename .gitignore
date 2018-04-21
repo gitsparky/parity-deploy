@@ -53,3 +53,4 @@ deployment/
 docker-compose.yml
 jmeter.log
 parity-deploy.iml
+parity-download.sh

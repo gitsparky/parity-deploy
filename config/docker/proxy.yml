@@ -1,0 +1,12 @@
+   proxy:
+      container_name: proxy
+      image: nginx:stable-alpine
+      ports:
+       - 8080:80
+       - 8180:8180
+       - 8545:8545
+       - 8546:8546
+      volumes:
+       - ./deployment/nginx/parity_ui.conf:/etc/nginx/conf.d/parity_ui.conf
+      depends_on:
+      - "client"
