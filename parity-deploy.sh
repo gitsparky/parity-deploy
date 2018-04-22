@@ -3,6 +3,7 @@
 CHAIN_NAME="parity"
 CHAIN_NODES="1"
 CLIENT="0"
+PARITY_RELEASE="stable"
 DOCKER_INCLUDE="include/docker-compose.yml"
 help()  {
 
@@ -57,7 +58,11 @@ genpw > $DEST_DIR/password
 
 local SPEC_FILE=$(mktemp -p $DEST_DIR spec.XXXXXXXXX)
 sed "s/CHAIN_NAME/$CHAIN_NAME/g" config/spec/example.spec > $SPEC_FILE
-parity --chain $SPEC_FILE --keys-path $DEST_DIR/ account new --password $DEST_DIR/password  > $DEST_DIR/address.txt
+
+CTR_BASE=/tmp
+CTR_DEST=$CTR_BASE/$DEST_DIR
+docker run --rm -v $(pwd)/$DEST_DIR:$CTR_DEST:Z parity/parity:$PARITY_RELEASE --chain $CTR_BASE/$SPEC_FILE --keys-path $CTR_DEST/ account new --password $CTR_DEST/password  > $DEST_DIR/address.txt
+#parity --chain $SPEC_FILE --keys-path $DEST_DIR/ account new --password $DEST_DIR/password  > $DEST_DIR/address.txt
 rm $SPEC_FILE
 
 echo "NETWORK_NAME=$CHAIN_NAME" > .env
@@ -287,20 +292,18 @@ fi
 
 
 
-# Get a copy of the parity binary, overwriting if release is set
+# Get a copy of the parity image, overwriting if release is set
 
-if [ ! -f /usr/bin/parity ] || [ -n "$PARITY_RELEASE" ] ; then
-
-        if [ -z "$PARITY_RELEASE" ] ; then
-                echo "NO custom parity build set, downloading beta"
-                bash <(curl https://get.parity.io -Lk)
-        else
-                echo "Custom parity build set: $PARITY_RELEASE"
-                curl -o parity-download.sh https://get.parity.io -Lk
-                bash parity-download.sh -r $PARITY_RELEASE
-        fi
+if [ -z "$PARITY_RELEASE" ] ; then
+    echo "Parity release not specified, cannot proceed."
+    exit 1
 fi
 
+docker pull parity/parity:$PARITY_RELEASE
+if [ $? -ne 0 ]; then
+    echo "Error fetching Parity docker image, exiting..."
+    exit 1
+fi
 
 mkdir -p deployment/chain
 check_packages
