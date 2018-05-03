@@ -1,0 +1,95 @@
+# [START add_project]
+swagger: "2.0"
+info:
+  description: "Guppy blockchain service."
+  title: "Guppy Private Blockchain"
+  version: "1.0.0"
+host: "guppy-chain01.endpoints.arched-memory-201801.cloud.goog"
+# [END add_project]
+x-google-endpoints:
+- name: "guppy-chain01.endpoints.arched-memory-201801.cloud.goog"
+  target: "35.196.97.13"
+  allowCors: "true"
+#basePath: "/"
+#x-google-allow: all
+consumes:
+- "application/json"
+produces:
+- "application/json"
+schemes:
+- "https"
+- "http"
+
+# This section requires all requests to any path to authenticate with Firebase.
+security:
+- firebase: []
+
+paths:
+  "/jsrpc":
+    get:
+      description: "JSON-RPC API"
+      operationId: "jsonrpc-get"
+      responses:
+        200:
+          description: OK
+    post:
+      description: "JSON-RPC API"
+      operationId: "jsonrpc"
+      responses:
+        200:
+          description: OK
+
+  "/wsrpc":
+    get:
+      description: "WebSockets-RPC API"
+      operationId: "wsrpc-get"
+      responses:
+        200:
+          description: OK
+    post:
+      description: "WebSockets-RPC API"
+      operationId: "wsrpc"
+      responses:
+        200:
+          description: OK
+
+  "/parity":
+    get:
+      description: "Parity UI"
+      operationId: "parity-get"
+      responses:
+        200:
+          description: OK
+    post:
+      description: "Parity UI"
+      operationId: "parity"
+      responses:
+        200:
+          description: OK
+
+  "/dash":
+    get:
+      description: "Dashboard"
+      operationId: "dashboard"
+      responses:
+        200:
+          description: OK
+
+# [START securityDef]
+securityDefinitions:
+  # This section configures basic authentication with an API key.
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"
+# [END securityDef]
+  # This section configures authentication using Firebase Auth.
+  # [START firebaseAuth]
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/guppy-service"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "guppy-service"
+  # [END firebaseAuth]

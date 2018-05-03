@@ -1,0 +1,14 @@
+   proxy:
+      image: gcr.io/endpoints-release/endpoints-runtime:1
+      container_name: proxy
+      ports:
+      - 8080:8080
+      - 8180:8180
+      - 8090:8090
+      volumes:
+      - ./deployment/nginx:/opt/nginx
+      command: --service=guppy-chain01.endpoints.arched-memory-201801.cloud.goog --nginx_config=/opt/nginx/nginx.conf --generate_self_signed_cert --rollout_strategy=managed
+      depends_on:
+      - client
+      - dashboard
+

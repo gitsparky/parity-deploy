@@ -2,7 +2,8 @@
 # Copyright 2017 Parity Technologies (UK) Ltd.
 CHAIN_NAME="parity"
 CHAIN_NODES="1"
-CLIENT="0"
+CLIENT="1"
+ETHSTATS="1"
 PARITY_RELEASE="stable"
 DOCKER_INCLUDE="include/docker-compose.yml"
 help()  {
@@ -143,6 +144,13 @@ build_docker_client() {
   fi
 }
 
+
+configure_proxy() {
+
+  cat include/proxy.yml >> docker-compose.yml
+  cp -r config/nginx deployment/
+
+}
 
 build_custom_chain() {
 
@@ -353,4 +361,11 @@ else
 fi
 
 build_docker_config_ethstats
-select_exposed_container
+# This is done by the proxy now
+# select_exposed_container
+configure_proxy
+
+# TODO: Make proxy/Gcloud setup optional, which means several things have to be conditional on proxy-enablement:
+#  - Construction of docker-compose
+#  - Enablement of client & ethstats (both forced to true for now)
+#  - Exposing of client & dashboard ports
