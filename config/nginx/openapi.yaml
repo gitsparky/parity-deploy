@@ -4,10 +4,10 @@ info:
   description: "Guppy blockchain service."
   title: "Guppy Private Blockchain"
   version: "1.0.0"
-host: "guppy-chain01.endpoints.arched-memory-201801.cloud.goog"
+host: "guppy-chain01.endpoints.[GPROJECT].cloud.goog"
 # [END add_project]
 x-google-endpoints:
-- name: "guppy-chain01.endpoints.arched-memory-201801.cloud.goog"
+- name: "guppy-chain01.endpoints.[GPROJECT].cloud.goog"
   target: "35.196.97.13"
   allowCors: "true"
 #basePath: "/"

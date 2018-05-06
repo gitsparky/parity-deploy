@@ -9,7 +9,7 @@
       volumes:
       - ./deployment/nginx:/opt/nginx:ro
       - ./deployment/letsencrypt:/etc/nginx/ssl:ro
-      command: --service=guppy-chain01.endpoints.arched-memory-201801.cloud.goog --nginx_config=/opt/nginx/nginx.conf --rollout_strategy=managed
+      command: --service=guppy-chain01.endpoints.[GPROJECT].cloud.goog --nginx_config=/opt/nginx/nginx.conf --rollout_strategy=managed
       depends_on:
       - client
       - dashboard

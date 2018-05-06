@@ -4,6 +4,7 @@ CHAIN_NAME="parity"
 CHAIN_NODES="1"
 CLIENT="1"
 ETHSTATS="1"
+GPROJECT=""
 PARITY_RELEASE="stable"
 DOCKER_INCLUDE="include/docker-compose.yml"
 help()  {
@@ -12,6 +13,7 @@ echo "parity-deploy.sh OPTIONS
 Usage:
 REQUIRED:
         --config dev / aura / tendermint / validatorset / input.json / custom_chain.toml
+        --gproject - Google Cloud Platform Project name
 
 OPTIONAL:
         --name name_of_chain. Default: parity
@@ -146,10 +148,11 @@ build_docker_client() {
 
 
 configure_proxy() {
-
-  cat include/proxy.yml >> docker-compose.yml
-  cp -r config/nginx deployment/
-
+  SEDEXPR="s/\[GPROJECT\]/$GPROJECT/g"
+  sed $SEDEXPR include/proxy.yml >> docker-compose.yml
+  mkdir -p deployment/nginx
+  sed $SEDEXPR config/nginx/nginx.conf >> deployment/nginx/nginx.conf
+  sed $SEDEXPR config/nginx/openapi.yaml >> deployment/nginx/openapi.yaml
 }
 
 build_custom_chain() {
@@ -285,6 +288,9 @@ while [ "$1" != "" ]; do
         --chain)                shift
                                 CHAIN_NETWORK=$1
                                 ;;
+        --gproject)             shift
+                                GPROJECT=$1
+                                ;;
         -h | --help )           help
                                 exit
                                 ;;
@@ -298,7 +304,10 @@ if [ -z "$CHAIN_ENGINE" ] && [ -z "$CHAIN_NETWORK" ]; then
     exit 1
 fi
 
-
+if [ -z "$GPROJECT" ]; then
+    echo "No Google Cloud project specified, exiting..."
+    exit 1
+fi
 
 # Get a copy of the parity image, overwriting if release is set
 
