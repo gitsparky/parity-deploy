@@ -1,6 +1,8 @@
    client:
        container_name: client
        image: parity/parity:stable
+       logging:
+           driver: gcplogs
        volumes:
        - ./deployment/chain/spec.json:/parity/spec.json:ro
        - ./deployment/chain/reserved_peers:/parity/reserved_peers:ro
