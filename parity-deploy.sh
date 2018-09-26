@@ -149,10 +149,10 @@ build_docker_client() {
 
 configure_proxy() {
   SEDEXPR="s/\[GPROJECT\]/$GPROJECT/g"
-  sed $SEDEXPR include/proxy.yml >> docker-compose.yml
+  sed $SEDEXPR config/docker/proxy.yml >> docker-compose.yml
   mkdir -p deployment/nginx
-  sed $SEDEXPR config/nginx/nginx.conf >> deployment/nginx/nginx.conf
-  sed $SEDEXPR config/nginx/openapi.yaml >> deployment/nginx/openapi.yaml
+  sed $SEDEXPR config/proxy/nginx.conf >> deployment/nginx/nginx.conf
+  sed $SEDEXPR config/proxy/openapi.yaml >> deployment/nginx/openapi.yaml
 }
 
 build_custom_chain() {
