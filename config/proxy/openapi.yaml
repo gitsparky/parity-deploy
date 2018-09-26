@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "Guppy blockchain service."
   title: "Guppy Private Blockchain"
-  version: "1.0.0"
+  version: "1.1.0"
 host: "guppy-chain01.endpoints.[GPROJECT].cloud.goog"
 # [END add_project]
 x-google-endpoints:
@@ -22,6 +22,7 @@ schemes:
 
 # This section requires all requests to any path to authenticate with Firebase.
 security:
+- guppy_node_service: []
 - firebase: []
 
 paths:
@@ -82,7 +83,27 @@ securityDefinitions:
     type: "apiKey"
     name: "key"
     in: "query"
-# [END securityDef]
+  # This section configures authentication using Google OAuth2 ID Tokens.
+  # ID Tokens can be obtained using OAuth2 clients, and can be used to access
+  # your API on behalf of a particular user.
+  google_id_token:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://accounts.google.com"
+    # Optional. Replace YOUR-CLIENT-ID with your client ID
+    #x-google-audiences: ""
+  # This section configures authentication using Google OAuth2 ID Tokens.
+  # ID Tokens can be obtained using OAuth2 clients, and can be used to access
+  # your API on behalf of a particular user.
+  guppy_node_service:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "guppy-service-chain-client@guppy-service-chain.iam.gserviceaccount.com"
+    x-google-jwks_uri: "https://www.googleapis.com/robot/v1/metadata/x509/guppy-service-chain-client@guppy-service-chain.iam.gserviceaccount.com"
+    # Optional. Replace YOUR-CLIENT-ID with your client ID
+    #x-google-audiences: ""
   # This section configures authentication using Firebase Auth.
   # [START firebaseAuth]
   firebase:
@@ -93,3 +114,4 @@ securityDefinitions:
     x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
     x-google-audiences: "guppy-service"
   # [END firebaseAuth]
+# [END securityDef]
