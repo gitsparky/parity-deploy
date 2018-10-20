@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "Guppy blockchain service."
   title: "Guppy Private Blockchain"
-  version: "1.1.0"
+  version: "1.2.0"
 host: "guppy-chain01.endpoints.[GPROJECT].cloud.goog"
 # [END add_project]
 x-google-endpoints:
@@ -23,6 +23,7 @@ schemes:
 # This section requires all requests to any path to authenticate with Firebase.
 security:
 - guppy_node_service: []
+- guppy_proxy_yodlee: []
 - firebase: []
 
 paths:
@@ -104,6 +105,12 @@ securityDefinitions:
     x-google-jwks_uri: "https://www.googleapis.com/robot/v1/metadata/x509/guppy-service-chain-client@guppy-service-chain.iam.gserviceaccount.com"
     # Optional. Replace YOUR-CLIENT-ID with your client ID
     #x-google-audiences: ""
+  guppy_proxy_yodlee:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "guppy-proxy-yodlee-client@guppy-proxy-yodlee.iam.gserviceaccount.com"
+    x-google-jwks_uri: "https://www.googleapis.com/robot/v1/metadata/x509/guppy-proxy-yodlee-client@guppy-proxy-yodlee.iam.gserviceaccount.com"
   # This section configures authentication using Firebase Auth.
   # [START firebaseAuth]
   firebase:
