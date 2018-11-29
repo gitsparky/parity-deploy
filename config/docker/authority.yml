@@ -1,6 +1,6 @@
    hostNODE_NAME:
        container_name: hostNODE_NAME 
-       image: parity/parity:stable
+       image: parity/parity:${PARITY_RELEASE}
        user: parity
        volumes:
        - ./deployment/chain/spec.json:/home/parity/spec.json:ro

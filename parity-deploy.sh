@@ -57,10 +57,14 @@ create_node_params() {
 
 	local SPEC_FILE=$(mktemp -p $DEST_DIR spec.XXXXXXXXX)
 	sed "s/CHAIN_NAME/$CHAIN_NAME/g" config/spec/example.spec >$SPEC_FILE
-	parity --chain $SPEC_FILE --keys-path $DEST_DIR/ account new --password $DEST_DIR/password >$DEST_DIR/address.txt
+	local CTR_DEST=/tmp/$DEST_DIR
+	local CTR_SPEC_FILE=$CTR_DEST/$(basename $SPEC_FILE)
+	docker run --rm -v $(pwd)/$DEST_DIR:$CTR_DEST:Z parity/parity:$PARITY_RELEASE --chain $CTR_SPEC_FILE --keys-path $CTR_DEST/ account new --password $CTR_DEST/password >$DEST_DIR/address.txt
+	#parity --chain $SPEC_FILE --keys-path $DEST_DIR/ account new --password $DEST_DIR/password >$DEST_DIR/address.txt
 	rm $SPEC_FILE
 
 	echo "NETWORK_NAME=$CHAIN_NAME" >.env
+	echo "PARITY_RELEASE=$PARITY_RELEASE" >>.env
 
 }
 
@@ -89,6 +93,14 @@ build_spec() {
 
 }
 
+create_docker_mounts() {
+	local host=$1
+	local root=$2
+	local base=$root/data/$host
+	mkdir -p $base/network $base/keys/$CHAIN_NAME
+	touch $base/network/key
+}
+
 build_docker_config_poa() {
 
 	echo "version: '2.0'" >docker-compose.yml
@@ -96,12 +108,10 @@ build_docker_config_poa() {
 
 	for x in $(seq 1 $CHAIN_NODES); do
 		cat config/docker/authority.yml | sed -e "s/NODE_NAME/$x/g" | sed -e "s@-d /home/parity/data@-d /home/parity/data $PARITY_OPTIONS@g" >>docker-compose.yml
-		mkdir -p data/$x
+		create_docker_mounts $x "$(pwd)"
 	done
 
 	build_docker_config_ethstats
-
-	cat $DOCKER_INCLUDE >>docker-compose.yml
 
 	chown -R $USER data/
 
@@ -117,6 +127,7 @@ build_docker_config_ethstats() {
 build_docker_config_instantseal() {
 
 	cat config/docker/instantseal.yml | sed -e "s@-d /home/parity/data@-d /home/parity/data $PARITY_OPTIONS@g" >docker-compose.yml
+	create_docker_mounts is_authority "$(pwd)"
 	build_docker_config_ethstats
 }
 
@@ -135,6 +146,7 @@ build_docker_client() {
 				echo "       - \"host${x}\"" >>docker-compose.yml
 			done
 		fi
+		create_docker_mounts client "$(pwd)"
 	fi
 }
 
@@ -287,18 +299,11 @@ if [ -z "$CHAIN_ENGINE" ] && [ -z "$CHAIN_NETWORK" ]; then
 	exit 1
 fi
 
-# Get a copy of the parity binary, overwriting if release is set
-
-if [ ! -f /usr/bin/parity ] || [ -n "$PARITY_RELEASE" ]; then
-
 	if [ -z "$PARITY_RELEASE" ]; then
-		echo "NO custom parity build set, downloading stable"
-		bash <(curl https://get.parity.io -Lk -r stable)
+	echo "NO custom parity build set, using stable"
+	PARITY_RELEASE=stable
 	else
 		echo "Custom parity build set: $PARITY_RELEASE"
-		curl -o parity-download.sh https://get.parity.io -Lk
-		bash parity-download.sh -r $PARITY_RELEASE
-	fi
 fi
 
 mkdir -p deployment/chain
@@ -334,6 +339,7 @@ elif [ "$CHAIN_ENGINE" == "aura" ] || [ "$CHAIN_ENGINE" == "validatorset" ] || [
 		done
 		build_docker_config_poa
 		build_docker_client
+		cat $DOCKER_INCLUDE >>docker-compose.yml
 	fi
 
 	if [ "$CHAIN_ENGINE" == "aura" ] || [ "$CHAIN_ENGINE" == "validatorset" ] || [ "$CHAIN_ENGINE" == "tendermint" ]; then
