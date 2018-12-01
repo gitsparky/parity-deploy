@@ -1,20 +1,21 @@
-#!/bin/sh
-#
-# Taken from: https://kobl.one/blog/create-full-ethereum-keypair-and-address/
-# Create a secp256k1 ec keypair
-
+#!/bin/bash
 TMPFILE=`mktemp`
+export PATH=$PATH:.
+
+if [ ! $(type -P ethkey) ];  then
+    ARCH=`arch`
+    ETHKEY_URL=`curl -sS "https://vanity-service.parity.io/parity-binaries?version=stable&format=markdown&os=linux&architecture=$ARCH" | grep ethkey | awk {'print $5'}  | cut -d"(" -f2 | cut -d")" -f1`
+    wget -q $ETHKEY_URL
+    chmod +x ethkey
+fi
+
 
 # Generate the private and public keys
-openssl ecparam -name secp256k1 -genkey -noout |   openssl ec -text -noout > $TMPFILE
+ethkey generate random > $TMPFILE
  
+cat $TMPFILE | grep public | awk {'print $2'} > $1/key.pub
+cat $TMPFILE | grep secret | awk {'print $2'} > $1/key.priv
 
-# Extract the public key and remove the EC prefix 0x04
-cat $TMPFILE | grep pub -A 5 | tail -n +2 | tr -d '\n[:space:]:' | sed 's/^04//' > $1/key.pub
-
-# Extract the private key and remove the leading zero byte
-cat $TMPFILE | grep priv -A 3 | tail -n +2 | tr -d '\n[:space:]:' | sed 's/^00//' > $1/key.priv
- 
 rm -rf $TMPFILE
 
 
