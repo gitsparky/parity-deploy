@@ -3,12 +3,12 @@ swagger: "2.0"
 info:
   description: "Guppy blockchain service."
   title: "Guppy Private Blockchain"
-  version: "1.2.0"
+  version: "1.2.1"
 host: "guppy-chain01.endpoints.[GPROJECT].cloud.goog"
 # [END add_project]
 x-google-endpoints:
 - name: "guppy-chain01.endpoints.[GPROJECT].cloud.goog"
-  target: "35.196.97.13"
+  target: "0.0.0.0"
   allowCors: "true"
 #basePath: "/"
 #x-google-allow: all
@@ -109,8 +109,8 @@ securityDefinitions:
     authorizationUrl: ""
     flow: "implicit"
     type: "oauth2"
-    x-google-issuer: "guppy-proxy-yodlee-client@guppy-proxy-yodlee.iam.gserviceaccount.com"
-    x-google-jwks_uri: "https://www.googleapis.com/robot/v1/metadata/x509/guppy-proxy-yodlee-client@guppy-proxy-yodlee.iam.gserviceaccount.com"
+    x-google-issuer: "guppy-proxy-yodlee-client@guppyproxyyodlee.iam.gserviceaccount.com"
+    x-google-jwks_uri: "https://www.googleapis.com/robot/v1/metadata/x509/guppy-proxy-yodlee-client@guppyproxyyodlee.iam.gserviceaccount.com"
   # This section configures authentication using Firebase Auth.
   # [START firebaseAuth]
   firebase:
